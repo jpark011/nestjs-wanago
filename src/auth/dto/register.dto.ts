@@ -1,3 +1,2 @@
-export class RegisterDto {
-  password: string;
-}
+import { CreateUserDto } from './../../users/dto/create-user.dto';
+export class RegisterDto extends CreateUserDto {}

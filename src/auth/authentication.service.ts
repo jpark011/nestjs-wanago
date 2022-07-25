@@ -1,3 +1,4 @@
+import { RegisterDto } from './dto/register.dto';
 import { PostgresErrorCode } from './../db/postgres-error-codes.enum';
 import { CreateUserDto } from './../users/dto/create-user.dto';
 import { UsersService } from './../users/users.service';
@@ -8,7 +9,7 @@ import bcrypt, { hash } from 'bcrypt';
 export class AuthenticationService {
   constructor(private userService: UsersService) {}
 
-  async register(registerDto: CreateUserDto) {
+  async register(registerDto: RegisterDto) {
     const hashed = await bcrypt.hash(registerDto.password, 10);
 
     try {
