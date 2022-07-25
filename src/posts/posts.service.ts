@@ -7,9 +7,6 @@ import Post from './entities/post.entity';
 
 @Injectable()
 export class PostsService {
-  private lastPostId = 0;
-  private posts: Post[] = [];
-
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
