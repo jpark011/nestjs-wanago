@@ -23,6 +23,19 @@ export class UsersService {
     );
   }
 
+  async getById(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (user) {
+      return user;
+    }
+
+    throw new HttpException(
+      'User with this email does not exit',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
   async create(userData: CreateUserDto) {
     const newUser = this.userRepository.create(userData);
 

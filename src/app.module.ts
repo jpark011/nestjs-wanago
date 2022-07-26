@@ -1,3 +1,4 @@
+import { AuthModule } from './auth/auth.module';
 import { DbModule } from './db/db.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -18,11 +19,14 @@ import Joi from '@hapi/joi';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRATION_TIME: Joi.number().default(3600),
       }),
       isGlobal: true,
     }),
     DbModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
