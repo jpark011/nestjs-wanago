@@ -5,6 +5,7 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthService } from './auth.service';
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Get,
   HttpCode,
@@ -12,11 +13,13 @@ import {
   Req,
   Res,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { RequestWithUser } from './request-with-user.interface';
-import { response, Response } from 'express';
+import { Request, response, Response } from 'express';
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -24,7 +27,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   authenticate(@Req() req: RequestWithUser) {
     const { user } = req;
-    user.password = undefined;
 
     return user;
   }
@@ -37,22 +39,19 @@ export class AuthController {
   @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('log-in')
-  async logIn(@Req() req: RequestWithUser, @Res() res: Response) {
+  async logIn(@Req() req: RequestWithUser) {
     const { user } = req;
     const cookie = await this.authService.getCookieWithJwtToken(user.id);
 
-    res.setHeader('Set-Cookie', cookie);
-    user.password = undefined;
+    req.res.setHeader('Set-Cookie', cookie);
 
-    return res.send(user);
+    return user;
   }
 
   @Post('log-out')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async logOut(@Res() res: Response) {
-    response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-
-    return res.sendStatus(200);
+  async logOut(@Req() req: Request) {
+    req.res.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
   }
 }
