@@ -1,7 +1,8 @@
-import * as request from 'supertest';
+import request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { AppModule } from './../src/app.module';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -9,6 +10,7 @@ describe('AppController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
+      providers: [{ provide: APP_PIPE, useClass: ValidationPipe }],
     }).compile();
 
     app = moduleFixture.createNestApplication();
