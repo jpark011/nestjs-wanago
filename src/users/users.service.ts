@@ -1,3 +1,6 @@
+import { ConfigService } from '@nestjs/config';
+import { buffer } from 'stream/consumers';
+import { FilesService } from './../files/files.service';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,6 +11,8 @@ import User from './entities/user.entity';
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private filesService: FilesService,
+    private configService: ConfigService,
   ) {}
 
   async getByEmail(email: string) {
@@ -42,5 +47,37 @@ export class UsersService {
     await this.userRepository.save(newUser);
 
     return newUser;
+  }
+
+  async addAvatar(userId: number, imageBuffer: Buffer, filename: string) {
+    const user = await this.getById(userId);
+    if (user.avatar) {
+      await this.userRepository.update(userId, {
+        ...user,
+        avatar: null,
+      });
+      await this.filesService.deletePublicFile(user.avatar.id);
+    }
+    const avatar = await this.filesService.uploadPublicFile(
+      imageBuffer,
+      filename,
+    );
+    await this.userRepository.update(userId, {
+      ...user,
+      avatar,
+    });
+    return avatar;
+  }
+
+  async deleteAvatar(userId: number) {
+    const user = await this.getById(userId);
+    const fileId = user.avatar?.id;
+    if (fileId) {
+      await this.userRepository.update(userId, {
+        ...user,
+        avatar: null,
+      });
+      await this.filesService.deletePublicFile(fileId);
+    }
   }
 }

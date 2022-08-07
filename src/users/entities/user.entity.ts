@@ -1,3 +1,4 @@
+import { PublicFile } from './../../files/public-file.entity';
 import { Address } from './address.entity';
 import { Exclude } from 'class-transformer';
 import {
@@ -25,12 +26,16 @@ class User {
   @Exclude()
   password: string;
 
-  @OneToOne(() => Address, { eager: true, cascade: true })
   @JoinColumn()
+  @OneToOne(() => Address, { eager: true, cascade: true })
   address: Address;
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
+
+  @JoinColumn()
+  @OneToOne(() => PublicFile, { eager: true, nullable: true })
+  avatar?: PublicFile;
 }
 
 export default User;
