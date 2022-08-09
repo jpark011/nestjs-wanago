@@ -23,6 +23,8 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
         PORT: Joi.number(),
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.number().default(3600),
+        REFRESH_SECRET: Joi.string().required(),
+        REFRESH_EXPIRATION_TIME: Joi.number().default(172800),
         TENTH2_UPLOAD_URL: Joi.string().required(),
         TENTH2_DOWNLOAD_URL: Joi.string().required(),
         TENTH2_SVC_ID: Joi.string().required(),

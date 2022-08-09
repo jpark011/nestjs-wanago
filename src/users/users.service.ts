@@ -6,11 +6,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import User from './entities/user.entity';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private filesService: FilesService,
     private configService: ConfigService,
   ) {}
@@ -47,6 +49,31 @@ export class UsersService {
     await this.userRepository.save(newUser);
 
     return newUser;
+  }
+
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const hashed = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update(userId, {
+      currentRefreshToken: hashed,
+    });
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.getById(userId);
+    const isMatch = await bcrypt.compare(
+      refreshToken,
+      user.currentRefreshToken,
+    );
+
+    if (isMatch) {
+      return user;
+    }
+  }
+
+  async removeRefreshToken(userId: number) {
+    this.userRepository.update(userId, {
+      currentRefreshToken: null,
+    });
   }
 
   async addAvatar(userId: number, imageBuffer: Buffer, filename: string) {

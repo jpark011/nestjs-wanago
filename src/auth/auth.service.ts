@@ -26,7 +26,10 @@ export class AuthService {
   }
 
   getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+    return [
+      'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0',
+    ];
   }
 
   async register(registerDto: RegisterDto) {
@@ -60,6 +63,22 @@ export class AuthService {
     } catch {
       throw new HttpException('Wrong crendential', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async getCookieWithJwtRefreshToken(userId: number) {
+    const payload: TokenPayload = { userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('REFRESH_SECRET'),
+      expiresIn: this.configService.get('REFRESH_EXPIRATION'),
+    });
+    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'REFRESH_EXPIRATION',
+    )}`;
+
+    return {
+      cookie,
+      token,
+    };
   }
 
   private async verifyPassword(

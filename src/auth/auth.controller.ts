@@ -1,3 +1,4 @@
+import { UsersService } from './../users/users.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
@@ -17,11 +18,15 @@ import {
 } from '@nestjs/common';
 import { RequestWithUser } from './request-with-user.interface';
 import { Request, response, Response } from 'express';
+import { RefreshGuard } from './refresh.guard';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -41,9 +46,18 @@ export class AuthController {
   @Post('log-in')
   async logIn(@Req() req: RequestWithUser) {
     const { user } = req;
-    const cookie = await this.authService.getCookieWithJwtToken(user.id);
+    const accessTokenCookie = await this.authService.getCookieWithJwtToken(
+      user.id,
+    );
+    const refreshTokenCookie =
+      await this.authService.getCookieWithJwtRefreshToken(user.id);
 
-    req.res.setHeader('Set-Cookie', cookie);
+    this.usersService.setCurrentRefreshToken(refreshTokenCookie.token, user.id);
+
+    req.res.setHeader('Set-Cookie', [
+      accessTokenCookie,
+      refreshTokenCookie.cookie,
+    ]);
 
     return user;
   }
@@ -51,7 +65,21 @@ export class AuthController {
   @Post('log-out')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  async logOut(@Req() req: Request) {
+  async logOut(@Req() req: RequestWithUser) {
+    await this.usersService.removeRefreshToken(req.user.id);
     req.res.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+  }
+
+  @Get('refresh')
+  @UseGuards(RefreshGuard)
+  async refresh(@Req() req: RequestWithUser) {
+    const { user } = req;
+    const accessTokenCookie = await this.authService.getCookieWithJwtToken(
+      user.id,
+    );
+
+    req.res.setHeader('Set-Cookie', accessTokenCookie);
+
+    return user;
   }
 }
