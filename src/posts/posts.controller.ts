@@ -1,3 +1,4 @@
+import { PaginationParams } from './../utils/pagination-params';
 import { RequestWithUser } from './../auth/request-with-user.interface';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import {
@@ -33,12 +34,15 @@ export class PostsController {
 
   @Get()
   // @Header('Content-Type', 'application/json')
-  findAll(@Query('search') search: string) {
+  findAll(
+    @Query('search') search: string,
+    @Query() { offset, limit }: PaginationParams,
+  ) {
     if (search) {
       return this.postsService.searchForPosts(search);
     }
 
-    return this.postsService.findAll();
+    return this.postsService.findAll(offset, limit);
   }
 
   @Get(':id')

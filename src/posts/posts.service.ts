@@ -23,8 +23,17 @@ export class PostsService {
     return newPost;
   }
 
-  async findAll() {
-    return this.postsRepository.find({ relations: ['author'] });
+  async findAll(offset?: number, limit?: number) {
+    const [items, count] = await this.postsRepository.findAndCount({
+      relations: ['author'],
+      order: {
+        id: 'ASC',
+      },
+      skip: offset,
+      take: limit,
+    });
+
+    return { items, count };
   }
 
   async findOne(id: number) {
@@ -66,15 +75,22 @@ export class PostsService {
     throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
   }
 
-  async searchForPosts(text: string) {
+  async searchForPosts(text: string, offset?: number, limit?: number) {
     const results = await this.postsSearchService.search(text);
-    const ids = results.map((result) => result.id);
+    const ids = results.map(({ id }) => id);
 
     if (!ids.length) {
       return [];
     }
-    return this.postsRepository.find({
+    const [items, count] = await this.postsRepository.findAndCount({
       where: { id: In(ids) },
+      order: {
+        id: 'ASC',
+      },
+      skip: offset,
+      take: limit,
     });
+
+    return {};
   }
 }
