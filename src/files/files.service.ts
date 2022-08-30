@@ -2,7 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { PublicFile } from './public-file.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { createHmac } from 'crypto';
 import { Readable } from 'typeorm/platform/PlatformTools';
@@ -41,12 +41,16 @@ export class FilesService {
     return newFile;
   }
 
-  async deletePublicFile(id: number) {
-    const file = await this.publicFileRepo.findOne({ where: { id } });
+  async deletePublicFile(id: number, queryRunner: QueryRunner) {
+    const file = await queryRunner.manager.findOne(PublicFile, {
+      where: { id },
+    });
 
     await firstValueFrom(
       this.tenth2Delete(file.filename).pipe(tap(console.log)),
     );
+
+    await queryRunner.manager.delete(PublicFile, id);
   }
 
   private tenth2Upload(dataBuffer: Buffer, filename: string) {

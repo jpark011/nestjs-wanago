@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   JoinTable,
   ManyToMany,
@@ -12,6 +13,7 @@ import {
 import User from '../../users/entities/user.entity';
 
 @Entity()
+@Index('multi', ['id', 'author'])
 class Post {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,6 +26,9 @@ class Post {
   // })
   content: string;
 
+  @Column('text', { array: true })
+  paragraphs: string[];
+
   @Column()
   title: string;
 
@@ -32,6 +37,7 @@ class Post {
   categories: Category[];
 
   @ManyToOne(() => User, (user) => user.posts)
+  @Index('post_authorId_index')
   author: User;
 }
 
