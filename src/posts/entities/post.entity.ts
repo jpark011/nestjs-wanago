@@ -26,7 +26,7 @@ class Post {
   // })
   content: string;
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, default: [] })
   paragraphs: string[];
 
   @Column()
