@@ -1,7 +1,11 @@
 import { SubscribersController } from './subscribers.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import {
+  ClientProxyFactory,
+  Transport,
+  ClientsModule,
+} from '@nestjs/microservices';
 
 @Module({
   imports: [ConfigModule],
@@ -10,14 +14,23 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     {
       provide: 'SUBSCRIBERS_SERVICE',
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) =>
-        ClientProxyFactory.create({
-          transport: Transport.TCP,
+      useFactory: (configService: ConfigService) => {
+        const user = configService.get('RABBITMQ_USER');
+        const password = configService.get('RABBITMQ_PASSWORD');
+        const host = configService.get('RABBITMQ_HOST');
+        const queueName = configService.get('RABBITMQ_QUEUE_NAME');
+
+        return ClientProxyFactory.create({
+          transport: Transport.RMQ,
           options: {
-            host: configService.get('SUBSCRIBERS_SERVICE_HOST'),
-            port: configService.get('SUBSCRIBERS_SERVICE_PORT'),
+            urls: [`amqp://${user}:${password}@${host}`],
+            queue: queueName,
+            queueOptions: {
+              durable: true,
+            },
           },
-        }),
+        });
+      },
     },
   ],
 })
