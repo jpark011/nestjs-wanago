@@ -1,7 +1,8 @@
+import { LogsMiddleware } from './middleware/logs.middleware';
 import { ExceptionsLoggerFilter } from './utils/exceptions-logger.filter';
 import { AuthModule } from './auth/auth.module';
 import { DbModule } from './db/db.module';
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -42,4 +43,8 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
     { provide: APP_FILTER, useClass: ExceptionsLoggerFilter },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogsMiddleware).forRoutes('*');
+  }
+}
