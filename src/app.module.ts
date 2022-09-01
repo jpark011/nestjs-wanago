@@ -10,6 +10,7 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import Joi from '@hapi/joi';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import HealthModule from './health/health.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { APP_FILTER, APP_PIPE } from '@nestjs/core';
     DbModule,
     UsersModule,
     AuthModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [
