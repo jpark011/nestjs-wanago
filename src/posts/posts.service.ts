@@ -39,7 +39,9 @@ export class PostsService {
   async findOne(id: number) {
     const post = this.postsRepository.findOne({
       where: { id },
-      relations: ['author'],
+      relations: {
+        author: true,
+      },
     });
 
     if (post) {
@@ -54,7 +56,9 @@ export class PostsService {
 
     const updatedPost = await this.postsRepository.findOne({
       where: { id },
-      relations: ['author'],
+      relations: {
+        author: true,
+      },
     });
 
     if (updatedPost) {
