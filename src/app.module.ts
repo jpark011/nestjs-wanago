@@ -12,6 +12,8 @@ import { UsersModule } from './users/users.module';
 import Joi from '@hapi/joi';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { CommentsModule } from './comments/comments.module';
+import { ProductModule } from './product/product.module';
+import { ProductCategoryModule } from './product-category/product-category.module';
 import HealthModule from './health/health.module';
 
 @Module({
@@ -42,6 +44,8 @@ import HealthModule from './health/health.module';
     HealthModule,
     CommentsModule,
     LogModule,
+    ProductModule,
+    ProductCategoryModule,
   ],
   controllers: [AppController],
   providers: [

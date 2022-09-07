@@ -3,6 +3,7 @@ import { DatabaseLogger } from './db.logger';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductCategory } from '../product/entities/product-category.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         database: configService.get('POSTGRES_DB'),
         autoLoadEntities: true,
         synchronize: true,
-        entities: [Address],
+        entities: [Address, ProductCategory],
         logger: new DatabaseLogger(),
       }),
     }),
