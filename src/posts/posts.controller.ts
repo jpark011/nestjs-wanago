@@ -20,9 +20,11 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('posts')
 @UseInterceptors(ClassSerializerInterceptor)
+@ApiTags('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

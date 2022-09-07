@@ -1,3 +1,4 @@
+import { AuthModule } from './auth.module';
 import { UsersService } from './../users/users.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { LocalAuthGuard } from './local-auth.guard';
@@ -19,8 +20,11 @@ import {
 import { RequestWithUser } from './request-with-user.interface';
 import { Request, response, Response } from 'express';
 import { RefreshGuard } from './refresh.guard';
+import User from '../users/entities/user.entity';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('auth')
 @UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
   constructor(
@@ -28,19 +32,28 @@ export class AuthController {
     private usersService: UsersService,
   ) {}
 
+  /**
+   * 인증을 수행합니다
+   */
   @Get()
   @UseGuards(JwtAuthGuard)
-  authenticate(@Req() req: RequestWithUser) {
+  authenticate(@Req() req: RequestWithUser): User {
     const { user } = req;
 
     return user;
   }
 
   @Post('register')
-  async register(@Body() registrationData: RegisterDto) {
+  async register(@Body() registrationData: RegisterDto): Promise<User> {
     return this.authService.register(registrationData);
   }
 
+  /**
+   * 우아우아!
+   * @throws {AuthModule}
+   * @param {string} req
+   * @returns {number}
+   */
   @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('log-in')

@@ -9,6 +9,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { RefreshStrategy } from './refresh.strategy.';
 
+/**
+ * 인증 모듈 설명입니다
+ * ## 마크업도 지원이 될까요? [컨트롤러 링크]{@link AuthController}
+ * @example Example
+ * 예시로는 이렇게 쓰일수 있어요
+ */
 @Module({
   imports: [
     UsersModule,
