@@ -1,3 +1,4 @@
+import { LogModule } from './logger/log.module';
 import { LogsMiddleware } from './middleware/logs.middleware';
 import { ExceptionsLoggerFilter } from './utils/exceptions-logger.filter';
 import { AuthModule } from './auth/auth.module';
@@ -40,6 +41,7 @@ import HealthModule from './health/health.module';
     AuthModule,
     HealthModule,
     CommentsModule,
+    LogModule,
   ],
   controllers: [AppController],
   providers: [
