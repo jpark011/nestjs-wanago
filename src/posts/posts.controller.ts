@@ -1,3 +1,4 @@
+import { HttpCacheInterceptor } from './../utils/http-cache.interceptor';
 import { PaginationParams } from './../utils/pagination-params';
 import { RequestWithUser } from './../auth/request-with-user.interface';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
@@ -16,8 +17,14 @@ import {
   Query,
   Headers,
   Header,
+  CacheInterceptor,
+  Inject,
+  CACHE_MANAGER,
+  CacheKey,
+  CacheTTL,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
+import { Cache } from 'cache-manager';
+import { GET_POSTS_CACHE_KEY, PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -26,7 +33,10 @@ import { ApiTags } from '@nestjs/swagger';
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -35,6 +45,9 @@ export class PostsController {
   }
 
   @Get()
+  @UseInterceptors(HttpCacheInterceptor)
+  @CacheKey(GET_POSTS_CACHE_KEY)
+  @CacheTTL(120)
   // @Header('Content-Type', 'application/json')
   findAll(
     @Query('search') search: string,
