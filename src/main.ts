@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { getLogLevels } from './utils/get-log-levels';
+import { runInCluster } from './utils/cluster';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -26,4 +27,5 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
-bootstrap();
+
+runInCluster(bootstrap);

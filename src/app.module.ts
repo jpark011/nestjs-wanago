@@ -35,6 +35,8 @@ import HealthModule from './health/health.module';
         TENTH2_DOWNLOAD_URL: Joi.string().required(),
         TENTH2_SVC_ID: Joi.string().required(),
         TENTH2_W_KEY: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
       }),
       isGlobal: true,
     }),
